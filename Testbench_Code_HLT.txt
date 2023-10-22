@@ -1,0 +1,118 @@
+// test bench for only CON = 13;
+
+// Please run this test code in the test bench segment of EDA playground
+
+module four_bit_pc_tb;
+reg clk,Ep,Lm_bar,CE_bar,LI_bar,EI_bar,Lb_bar,Ea,Lo_bar,L,call,addition,subtraction,XCNG,INC,RCR,PUSH,STOP;
+  reg [0:3]pc;
+  reg [0:3]op_code,Address_location,init_IP;
+  reg [0:3]B_st;
+  reg[0:7]Byte;
+  reg Cin;
+  reg [0:3] A_st; 
+  reg[0:3]CON;
+  reg[0:3]Address_value;
+  wire [0:3] ADD;
+  wire [0:3] SUB,IP; 
+  wire Cout,CF,ZF;
+  wire Cout_1;
+  wire [0:3]A;
+  wire [0:3]out_wire,B_register;
+  wire[0:3]B,stack;
+  wire[0:11]MAR,RAM;
+  wire[0:7]IR;
+ four_bit_pc uut(
+   .clk( clk),
+   .STOP(STOP),
+   .Ep(Ep),
+   .Lm_bar(Lm_bar),
+   .CE_bar(CE_bar),
+   .LI_bar(LI_bar),
+   .EI_bar(EI_bar),
+   .Lb_bar(Lb_bar),
+   .pc(pc),
+   .op_code(op_code),
+   .B_st(B_st),
+   .A_st(A_st),
+   .Cin(Cin),
+   .ADD(ADD),
+   .SUB(SUB),
+   .Cout_1(Cout_1),
+   .Cout(Cout),
+   .CON(CON),
+   .Address_value(Address_value),
+   .A(A),
+   .out_wire(out_wire),
+   .Ea(Ea),
+   .Lo_bar(Lo_bar),
+   .L(L),
+   .CF(CF),
+   .ZF(ZF),
+   .B(B),
+   .stack(stack),
+   .IP(IP),
+   .Address_location(Address_location),
+   .call(call),
+   .Byte(Byte),
+   .addition(addition),
+   .subtraction(subtraction),
+   .B_register(B_register),
+   .MAR(MAR),
+   .RAM(RAM),
+   .IR(IR),
+   .XCNG(XCNG),
+   .INC(INC),
+   .RCR(RCR),
+   .init_IP(init_IP),
+   .PUSH(PUSH)
+  );
+
+
+    initial begin
+   // Dump waves
+      $dumpfile("dump.vcd");
+      $dumpvars(1);
+      
+    // just run this test code
+      
+    CON =13;
+    clk=0; 
+    STOP=0;
+    #5 clk=~clk; //1
+    #5 clk=~clk;//0
+    #5 clk=~clk;//1
+    #5 clk=~clk;//0
+    #5 clk=~clk;//1
+    #5 clk=~clk;//0
+    #5 clk=~clk;//1
+    #5 clk=~clk;//0
+      
+    #5 clk=~clk;//1
+       
+       CON=0;
+    
+      #5 clk=0;
+      STOP=1;
+      #5 clk=0;
+      #5 clk=0;
+      #5 clk=0;
+     #5 clk=0;
+     #5 clk=0;
+     #5 clk=0;
+     #5 clk=0;
+     #5 clk=0;
+     #5 clk=0;
+     #5 clk=0;
+       #5 clk=0;
+      #5 clk=0;
+      #5 clk=0;
+      #5 clk=0;
+     #5 clk=0;
+     #5 clk=0;
+     #5 clk=0;
+     #5 clk=0;
+     #5 clk=0;
+     #5 clk=0;
+     #5 clk=0;
+  end
+endmodule

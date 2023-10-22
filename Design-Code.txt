@@ -1,0 +1,272 @@
+// 4 bit computer design code
+
+// Please run the code in the design segment of EDA playground
+
+module four_bit_pc(clk,pc,Ep,Lm_bar,CE_bar,LI_bar,EI_bar,Lb_bar,op_code,B_st,Cout_1,Cout,SUB,
+                   ADD,A_st,Cin,CON,A,Address_value,out_wire,Ea,Lo_bar,L,CF,ZF,B,stack,HLT,STOP,IP,Address_location,call,ret,Byte,addition,subtraction,B_register,MAR,RAM,IR,XCNG,INC,RCR,init_IP,PUSH);
+  input clk,Ep,Lm_bar,CE_bar,LI_bar,EI_bar,Lb_bar,Ea,Lo_bar,L,call,ret,addition,subtraction,XCNG,INC,RCR,PUSH;
+  input[0:3]op_code;
+  input [0:3]CON;
+  input [0:3]B_st;
+  input [0:3]Address_value,Address_location,init_IP;
+  input [0:7]Byte;
+  reg [0:11]t_1;
+  reg  [0:11]t_2;
+  reg  [0:7]t_3;
+  output  reg [0:3]B_register;
+  output reg[0:11]MAR;
+  output reg[0:11]RAM;
+  output reg [0:7]IR;
+  reg[0:3]temp;
+  reg[0:3]temp_1;
+  input[0:3] A_st;
+  input Cin,STOP;
+  output reg CF,ZF,HLT;
+  reg CF_1;
+  output reg Cout,Cout_1; 
+  output reg[0:3]B;
+  output reg [0:3]stack,IP; 
+  output reg [0:3]ADD;
+  output reg [0:3]SUB;
+  output reg [0:3]A;
+  output reg [0:3]out_wire;
+  input [0:3]pc;
+  integer i;
+  always@(negedge clk)
+    begin
+      if(CON==1) // ADD , SUB
+        begin
+        if(Ep==1 && Lm_bar==0)
+          
+        begin
+          for(i=0;i<=3;i=i+1)
+              begin
+                t_1[i]=pc[i];
+                t_2[i]=t_1[i];
+                MAR[i]=t_1[i];
+                RAM[i]=t_2[i];
+              end
+
+          for(i=4;i<=7;i=i+1)
+              begin
+                t_2[i]=op_code[i-4];
+                RAM[i]=t_2[i];
+              end
+
+            for(i=8;i<=11;i=i+1)
+              begin
+                t_2[i]=B_st[i-8];
+                RAM[i]=t_2[i];
+             end
+        end 
+      
+      
+      else if (CE_bar==0 && LI_bar==0)
+            
+            begin
+                for(i=0;i<=7;i=i+1)
+                  begin
+                    t_3[i]=t_2[4+i];
+                    IR[i]=t_3[i];
+                  end
+            end
+          
+          else if(EI_bar==0 && Lm_bar==0)
+            begin
+                for(i=4;i<=7;i=i+1)
+                  begin
+                    t_1[4+i]=t_3[i];
+                    t_2[4+i]=t_1[4+i];
+                    MAR[4+i]=t_1[4+i];
+                    RAM[4+i]=t_2[4+i];
+                  end
+              end
+          
+           else if(CE_bar==0 && Lb_bar==0)
+            begin
+              for(i=8;i<=11;i=i+1)
+                begin
+                  B_register[i-8]=t_2[i];
+                  
+                end
+              if(addition==1)
+                assign {CF,ADD} = A_st+B_st+Cin;  //ADD
+              if (subtraction==1)
+                assign {CF,SUB} = A_st-B_st ; //SUB
+            end
+        end
+            
+      else if(CON==2)  //XCNG
+          begin
+           
+            assign A=A_st; 
+            assign B=B_st; 
+            if(XCNG)
+              begin
+                assign A=B_st;
+                assign B=A_st;
+              end   
+          end
+      
+      else if (CON==3) // MOV A,[Address]
+        begin
+          for (i=0;i<=3;i=i+1)
+            A[i]=Address_value[i];
+        
+      
+          if(Ea==1 && Lo_bar==0) //OUT A
+          assign out_wire=A;
+        end
+      
+      else if(CON==4)  //INC
+        begin
+          if(L)
+            begin
+              assign temp=4'b1111;
+              assign A = temp;
+              assign CF=0;
+            end
+          if(INC)
+           begin
+             if(temp[0]==1 && temp[1]==1 && temp[2]==1 && temp[3]==1)
+                assign CF=1;
+              else
+                assign CF=0;
+             assign temp = temp+1;
+             assign A=temp;   
+           end
+        end
+      
+      
+      else if (CON==5) //RCR
+        begin
+          if(L)
+            begin
+              assign temp=4'b1101;
+              assign A = temp;
+            end
+          assign CF_1=0;
+          assign CF=CF_1;
+          if(RCR)
+             begin
+                assign CF =temp[3];
+
+                for(i=0;i<=3;i=i+1)
+                  begin
+                    if (i==0)
+                     temp_1[i]=CF_1;
+                   else
+                        temp_1[i]=temp[i-1];
+                  end
+
+              assign A = temp_1;
+              end
+       end
+      
+      else if(CON==6) //BYTE
+        $display("Error Operation");
+      
+   
+      else if(CON==7) //JNZ
+        begin
+          if(L)
+            begin
+              assign temp=4'b0110;
+              assign A = temp;
+              assign IP=4'b0101;
+            end
+          if(A==0)
+            assign ZF = 1;
+          else
+            assign ZF =0;
+          if(ZF==0) begin
+            assign A = temp-1;  //ADDRESS: DEC A
+            assign IP=Address_location;  end
+          else begin
+            assign A=temp;
+            assign IP=init_IP; end
+            
+        end
+      else if(CON==8)// PUSH B
+        begin
+          if(PUSH)
+          begin
+            assign stack = B_st;
+            assign temp_1=B_st;
+            assign temp = 4'b0000;
+            assign B = temp;
+            assign IP=Address_location;
+          end
+              else begin assign B = B_st;
+                assign IP=init_IP; end
+                
+        end
+     else if(CON==9) //POP B
+        begin
+          assign stack = B_st;
+          assign temp_1=B_st;
+          assign temp = 4'b0000;
+          assign B = temp;
+          assign stack = temp;
+          assign B = temp_1;
+          assign IP=init_IP+1;
+        end
+          
+   else if(CON==10)   // CALL ADDRESS 
+        begin
+          if(L)
+            begin
+             assign temp_1=4'b0110;
+             assign IP=temp_1;
+             if(call==1)
+                begin
+                   assign stack=temp_1;
+                   assign IP =Address_location;
+                   assign temp=A_st;
+                   assign temp=temp-1;  //ADDRESS: DEC A
+                   assign A=temp;
+                  
+                  if(ret==1)  //RET
+                    begin
+                      assign IP=temp_1+1;
+                      assign stack=4'b0000;
+                    end
+
+                end
+              else begin assign IP =temp_1; assign A=A_st; end
+              
+            end
+        end
+      
+     else if (CON==11)   //OR
+        begin
+          assign A = A_st;
+          assign temp = A_st;
+          assign temp_1=Address_value;
+          assign A = temp|temp_1;
+        end
+     else if (CON==12)   //XOR
+        begin
+          assign A = A_st;
+          assign temp = A_st;
+          assign temp_1=Address_value;
+          assign A= temp^temp_1;
+        end
+      
+     else if(CON==13)   //HLT
+        begin
+          if(STOP==0)
+           assign HLT = 0;
+          else
+            assign HLT = 1;
+
+        end
+  end 
+endmodule
+
+
+
+
+
+
+
