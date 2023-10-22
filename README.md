@@ -1,0 +1,2 @@
+# Design-of-a-4-bit-Microprocessor-using-Verilog-HDL
+All the instructions of Assembly Language (ADD, PUSH, POP etc.) were implemented in  EDA playground using Verilog HDL design code and also  were verified by Verilog test-bench code as well.  SAP 1 computer architecture was followed and Memory Access Register (MAR), Random Access Memory (RAM), Instruction Register (IR) memories were implemented. 
